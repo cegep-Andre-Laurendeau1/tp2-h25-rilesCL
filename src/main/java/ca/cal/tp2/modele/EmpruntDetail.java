@@ -1,81 +1,59 @@
 package ca.cal.tp2.modele;
 
+import jakarta.persistence.*;
+import jdk.vm.ci.meta.Local;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 import java.util.Date;
 
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class EmpruntDetail {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int lineItemID;
-    private Date dateRetourPrevue;
-    private Date dateRetourActuelle;
-    private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "documentId")
     private Document document;
 
-    public EmpruntDetail() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "empruntId")
+    private Emprunt emprunt;
 
-    public EmpruntDetail(int lineItemID, Date dateRetourPrevue, Date dateRetourActuelle, String status) {
-        this.lineItemID = lineItemID;
-        this.dateRetourPrevue = dateRetourPrevue;
-        this.dateRetourActuelle = dateRetourActuelle;
-        this.status = status;
-    }
+    private LocalDate dateRetourPrevue;
+    private LocalDate dateRetourActuelle;
+    private String status;
 
     public boolean isEnRetard() {
         if (dateRetourActuelle == null) {
-            return new Date().after(dateRetourPrevue);
+            return LocalDate.now().isAfter(dateRetourPrevue);
         }
-        return dateRetourActuelle.after(dateRetourPrevue);
+        return dateRetourActuelle.isAfter(dateRetourPrevue);
     }
 
     public double calculAmende() {
         if (!isEnRetard()) {
             return 0.0;
         }
-        long diffInMillies = dateRetourActuelle.getTime() - dateRetourPrevue.getTime();
-        long diffInDays = diffInMillies / (24 * 60 * 60 * 1000);
-        return diffInDays * 0.25;
+        LocalDate dateComparaison = (dateRetourActuelle != null) ? dateRetourActuelle : LocalDate.now();
+        long joursRetard = java.time.temporal.ChronoUnit.DAYS.between(dateRetourPrevue, dateComparaison);
+
+        return joursRetard * 0.25;
     }
 
     public void updateStatus() {
-        status = isEnRetard() ? "EN_RETARD" : "EN_COURS";
-    }
-
-        // Getters et Setters
-    public int getLineItemID() {
-        return lineItemID;
-    }
-
-    public void setLineItemID(int lineItemID) {
-        this.lineItemID = lineItemID;
-    }
-
-    public Date getDateRetourPrevue() {
-        return dateRetourPrevue;
-    }
-
-    public void setDateRetourPrevue(Date dateRetourPrevue) {
-        this.dateRetourPrevue = dateRetourPrevue;
-    }
-
-    public Date getDateRetourActuelle() {
-        return dateRetourActuelle;
-    }
-
-    public void setDateRetourActuelle(Date dateRetourActuelle) {
-        this.dateRetourActuelle = dateRetourActuelle;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    public Document getDocument() {
-        return document;
-    }
-
-    public void setDocument(Document document) {
-        this.document = document;
+        if (dateRetourActuelle != null) {
+            this.status = "Retourné";
+        } else if (isEnRetard()) {
+            this.status = "En retard";
+        } else {
+            this.status = "En cours";
+        }
     }
 }

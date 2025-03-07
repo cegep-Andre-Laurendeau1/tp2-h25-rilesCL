@@ -1,38 +1,44 @@
 package ca.cal.tp2.modele;
 
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@Getter
+@Setter
+@NoArgsConstructor
 abstract class Document  {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int documentId;
     private String titre;
     private int nombreExemplaires;
+    private int nombreDisponibles;
 
-    public Document() {}
-
-    public Document(int documentId, String titre, int nombreExemplaires) {
-        this.documentId = documentId;
-        this.titre = titre;
-        this.nombreExemplaires = nombreExemplaires;
-    }
+    @OneToMany(mappedBy = "document")
+    private List<EmpruntDetail> empruntsDetails = new ArrayList<>();
 
     public boolean verifieDisponibilite() {
-        return nombreExemplaires > 0;
+        return nombreDisponibles > 0;
     }
 
-    public int getDocumentId() {
-        return documentId;
+    public void emprunter() {
+        if (verifieDisponibilite()) {
+            nombreDisponibles--;
+        }
     }
-    public void setDocumentId(int documentId) {
-        this.documentId = documentId;
+
+    public void retourner() {
+        if (nombreDisponibles < nombreExemplaires) {
+            nombreDisponibles++;
+        }
     }
-    public String getTitre() {
-        return titre;
-    }
-    public void setTitre(String titre) {
-        this.titre = titre;
-    }
-    public int getNombreExemplaires() {
-        return nombreExemplaires;
-    }
-    public void setNombreExemplaires(int nombreExemplaires) {
-        this.nombreExemplaires = nombreExemplaires;
-    }
+
 }

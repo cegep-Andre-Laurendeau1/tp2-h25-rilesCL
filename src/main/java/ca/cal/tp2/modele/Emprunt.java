@@ -1,48 +1,35 @@
 package ca.cal.tp2.modele;
 
+import jakarta.persistence.*;
+import jdk.vm.ci.meta.Local;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Emprunt{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int borrowID;
-    private Date dateEmprunt;
+
+    @ManyToOne
+    @JoinColumn(name = "emprunteurId")
+    private Emprunteur emprunteur;
+
+    @OneToMany(mappedBy = "emprunt")
+    private List<EmpruntDetail> empruntDetails;
+
+    private LocalDate dateEmprunt;
     private String status;
-    private EmpruntDetail empruntDetail;
 
-    public Emprunt() {
-    }
-
-    public Emprunt(int borrowID, Date dateEmprunt, String status) {
-        this.borrowID = borrowID;
-        this.dateEmprunt = dateEmprunt;
-        this.status = status;
-    }
-
-    public EmpruntDetail getItems() {
-        return empruntDetail;
-    }
-
-    // Getters et Setters
-    public int getBorrowID() {
-        return borrowID;
-    }
-
-    public void setBorrowID(int borrowID) {
-        this.borrowID = borrowID;
-    }
-
-    public Date getDateEmprunt() {
-        return dateEmprunt;
-    }
-
-    public void setDateEmprunt(Date dateEmprunt) {
-        this.dateEmprunt = dateEmprunt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public List<EmpruntDetail> getItems() {
+        return empruntDetails;
     }
 }
