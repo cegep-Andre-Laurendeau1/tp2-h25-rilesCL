@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-abstract class Document  {
+public abstract class Document  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int documentId;

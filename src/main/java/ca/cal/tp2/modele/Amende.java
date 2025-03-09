@@ -1,5 +1,6 @@
 package ca.cal.tp2.modele;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class Amende {
@@ -7,6 +8,7 @@ public class Amende {
     private double montant;
     private Date dateCreation;
     private boolean status;
+    private Emprunteur emprunteur;
 
     public Amende() {
     }
@@ -49,7 +51,7 @@ public class Amende {
         return dateCreation;
     }
 
-    public void setDateCreation(Date dateCreation) {
+    public void setDateCreation(LocalDate dateCreation) {
         this.dateCreation = dateCreation;
     }
 
@@ -59,5 +61,10 @@ public class Amende {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public void setEmprunteur(Emprunteur emprunteur) {
+        this.emprunteur = emprunteur;
+    }
     }
 }

@@ -1,50 +1,57 @@
 package ca.cal.tp2.modele;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Emprunteur extends Utilisateur {
+    @OneToMany(mappedBy = "emprunteur")
     private List<Emprunt> emprunts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "emprunteur")
     private List<Amende> amendes;
-
-    public Emprunteur() {
-        super();
-        this.emprunts = new ArrayList<>();
-        this.amendes = new ArrayList<>();
-    }
-
-    public Emprunteur(int userID, String name, String email, String phoneNumber) {
-        super(userID, name, email, phoneNumber);
-        this.emprunts = new ArrayList<>();
-        this.amendes = new ArrayList<>();
-    }
 
     public void emprunte(Document document) {
         if (document != null && document.verifieDisponibilite()) {
             Emprunt nouvelEmprunt = new Emprunt();
-            nouvelEmprunt.setDateEmprunt(new Date());
+            nouvelEmprunt.setDateEmprunt(LocalDate.now());
             nouvelEmprunt.setStatus("EN_COURS");
+            nouvelEmprunt.setEmprunteur(this);
             emprunts.add(nouvelEmprunt);
+            document.emprunter();
         }
     }
 
-    public void retourneDocument(Document document) {
-        if (document != null) {
-            for (Emprunt emprunt : emprunts) {
-                if (emprunt.getStatus().equals("EN_COURS")) {
-                    emprunt.setStatus("RETOURNE");
-                    break;
-                }
-            }
-        }
-
-    }
+    //Implémenter la méthode retourneDocument(Document document) dans la classe Emprunteur !
+//    public void retourneDocument(Document document) {
+//        if (document != null) {
+//            for (Emprunt emprunt : emprunts) {
+//                if (emprunt.getStatus().equals("EN_COURS")) {
+//                    emprunt.setStatus("RETOURNE");
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     public void payeAmende(double montant) {
-        if (montant > 0) {
+        if  (montant > 0) {
             Amende nouvelleAmende = new Amende();
             nouvelleAmende.setMontant(montant);
+            nouvelleAmende.setDateCreation(LocalDate.now());
+            nouvelleAmende.setStatus(false); // Non payée
+            nouvelleAmende.setEmprunteur(this);±
             amendes.add(nouvelleAmende);
         }
     }
@@ -53,20 +60,4 @@ public class Emprunteur extends Utilisateur {
         return new ArrayList<>(emprunts);
     }
 
-    public List<Emprunt> getEmprunts() {
-        return new ArrayList<>(emprunts);
-    }
-
-    public List<Amende> getAmendes() {
-        return new ArrayList<>(amendes);
-    }
-
-    // Setters pour CREATE/JDBC
-    public void setEmprunts(List<Emprunt> emprunts) {
-        this.emprunts = emprunts;
-    }
-
-    public void setAmendes(List<Amende> amendes) {
-        this.amendes = amendes;
-    }
 }
