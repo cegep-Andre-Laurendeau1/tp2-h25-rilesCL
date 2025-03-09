@@ -19,9 +19,6 @@ public class Emprunteur extends Utilisateur {
     @OneToMany(mappedBy = "emprunteur")
     private List<Emprunt> emprunts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "emprunteur")
-    private List<Amende> amendes;
-
     public void emprunte(Document document) {
         if (document != null && document.verifieDisponibilite()) {
             Emprunt nouvelEmprunt = new Emprunt();
@@ -44,17 +41,6 @@ public class Emprunteur extends Utilisateur {
 //            }
 //        }
 //    }
-
-    public void payeAmende(double montant) {
-        if  (montant > 0) {
-            Amende nouvelleAmende = new Amende();
-            nouvelleAmende.setMontant(montant);
-            nouvelleAmende.setDateCreation(LocalDate.now());
-            nouvelleAmende.setStatus(false); // Non payée
-            nouvelleAmende.setEmprunteur(this);±
-            amendes.add(nouvelleAmende);
-        }
-    }
 
     public ArrayList<Emprunt> rapportHistoriqueEmprunt() {
         return new ArrayList<>(emprunts);
