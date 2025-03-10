@@ -1,5 +1,8 @@
 package ca.cal.tp2.Repository;
 
+import ca.cal.tp2.modele.Cd;
+import ca.cal.tp2.modele.Dvd;
+import ca.cal.tp2.modele.Livre;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -10,7 +13,7 @@ import java.util.Optional;
 
 public class DocumentRepositoryJPA implements DocumentRepository{
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("tp2-h25-rilesCL.pu");
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("tp2-h25-ghilas.pu");
 
     @Override
     public Document save(Document document) {
@@ -105,6 +108,108 @@ public class DocumentRepositoryJPA implements DocumentRepository{
             List<Document> result = query.getResultList();
             em.getTransaction().commit();
             return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Override
+    public List<Document> findAllLivres() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            TypedQuery<Livre> query = em.createQuery("FROM Livre", Livre.class);
+            List<Livre> livres = query.getResultList();
+            em.getTransaction().commit();
+            return List.copyOf(livres);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Document> findAllCds() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            TypedQuery<Cd> query = em.createQuery("FROM Cd", Cd.class);
+            List<Cd> cds = query.getResultList();
+            em.getTransaction().commit();
+            return List.copyOf(cds);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Document> findAllDvds() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            TypedQuery<Dvd> query = em.createQuery("FROM Dvd", Dvd.class);
+            List<Dvd> dvds = query.getResultList();
+            em.getTransaction().commit();
+            return List.copyOf(dvds);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Document> findLivresByAuteur(String auteur) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            TypedQuery<Livre> query = em.createQuery(
+                    "FROM Livre l WHERE LOWER(l.auteur) LIKE LOWER(:auteur)",
+                    Livre.class);
+            query.setParameter("auteur", "%" + auteur + "%");
+            List<Livre> livres = query.getResultList();
+            em.getTransaction().commit();
+            return List.copyOf(livres);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Document> findLivresByAnnee(int annee) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            TypedQuery<Livre> query = em.createQuery(
+                    "FROM Livre l WHERE l.anneePublication = :annee",
+                    Livre.class);
+            query.setParameter("annee", annee);
+            List<Livre> livres = query.getResultList();
+            em.getTransaction().commit();
+            return List.copyOf(livres);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Document> findCdsByArtiste(String artiste) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            TypedQuery<Cd> query = em.createQuery(
+                    "FROM Cd c WHERE LOWER(c.artiste) LIKE LOWER(:artiste)",
+                    Cd.class);
+            query.setParameter("artiste", "%" + artiste + "%");
+            List<Cd> cds = query.getResultList();
+            em.getTransaction().commit();
+            return List.copyOf(cds);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Document> findDvdsByRealisateur(String realisateur) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            TypedQuery<Dvd> query = em.createQuery(
+                    "FROM Dvd d WHERE LOWER(d.director) LIKE LOWER(:realisateur)",
+                    Dvd.class);
+            query.setParameter("realisateur", "%" + realisateur + "%");
+            List<Dvd> dvds = query.getResultList();
+            em.getTransaction().commit();
+            return List.copyOf(dvds);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

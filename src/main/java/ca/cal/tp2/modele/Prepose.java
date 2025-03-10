@@ -29,7 +29,7 @@ public class Prepose extends Utilisateur {
         this.setPhoneNumber(phoneNumber);
     }
 
-    private void setName(String name) {
+    public void setName(String name) {
     }
 
 

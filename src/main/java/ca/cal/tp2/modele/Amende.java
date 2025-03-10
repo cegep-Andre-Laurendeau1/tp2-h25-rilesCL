@@ -1,19 +1,18 @@
 package ca.cal.tp2.modele;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Amende {
     private int fineID;
     private double montant;
-    private Date dateCreation;
+    private LocalDate dateCreation;
     private boolean status;
     private Emprunteur emprunteur;
 
     public Amende() {
     }
 
-    public Amende(int fineID, double montant, Date dateCreation, boolean status) {
+    public Amende(int fineID, double montant, LocalDate dateCreation, boolean status) {
         this.fineID = fineID;
         this.montant = montant;
         this.dateCreation = dateCreation;
@@ -22,7 +21,7 @@ public class Amende {
 
     public void calculMontant() {
         if (montant <= 0) {
-            this.montant = 0.25; // Montant minimal d'une amende
+            this.montant = 0.25;
         }
     }
 
@@ -47,7 +46,7 @@ public class Amende {
         this.montant = montant;
     }
 
-    public Date getDateCreation() {
+    public LocalDate getDateCreation() {
         return dateCreation;
     }
 
@@ -66,5 +65,5 @@ public class Amende {
     public void setEmprunteur(Emprunteur emprunteur) {
         this.emprunteur = emprunteur;
     }
-    }
 }
+

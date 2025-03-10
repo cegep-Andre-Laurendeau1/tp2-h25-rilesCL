@@ -1,13 +1,11 @@
 package ca.cal.tp2.modele;
 
 import jakarta.persistence.*;
-import jdk.vm.ci.meta.Local;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Getter
