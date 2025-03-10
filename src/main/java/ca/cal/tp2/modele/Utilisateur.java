@@ -16,18 +16,18 @@ abstract class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
-    private String nom;
+    private String name;
     private String email;
     private String phoneNumber;
 
         public void login() {
-            if (userId > 0 && nom != null && email != null) {
+            if (userId > 0 && name != null && email != null) {
                 notifyLogin();
             }
         }
 
     private void notifyLogin() {
-        String loginInfo = String.format("ID: %d, Name: %s", userId, nom);
+        String loginInfo = String.format("ID: %d, Name: %s", userId, name);
 
     }
 }

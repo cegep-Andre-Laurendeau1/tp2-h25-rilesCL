@@ -16,5 +16,4 @@ public class Livre extends Document {
     private String Auteur;
     private int nbPages;
     private int anneePublication;
-
 }
