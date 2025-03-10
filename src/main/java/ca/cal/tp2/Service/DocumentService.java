@@ -20,7 +20,6 @@ public class DocumentService {
         this.documentRepository = documentRepository;
     }
 
-    // Méthodes pour ajouter des documents
 
     public LivreDTO ajouterLivre(LivreDTO livreDTO) {
         Livre livre = new Livre();
@@ -35,7 +34,6 @@ public class DocumentService {
 
         Livre savedLivre = (Livre) documentRepository.save(livre);
 
-        // Convertir l'entité sauvegardée en DTO pour la retourner
         livreDTO.setDocumentId(savedLivre.getDocumentId());
         return livreDTO;
     }
@@ -70,12 +68,10 @@ public class DocumentService {
         return dvdDTO;
     }
 
-    // Méthodes pour rechercher des documents
 
     public List<LivreDTO> rechercherLivresParTitre(String titrePartiel) {
         List<Document> livres = documentRepository.findAllLivres();
 
-        // Filtrer les livres dont le titre contient la chaîne spécifiée
         return livres.stream()
                 .filter(doc -> doc.getTitre().toLowerCase().contains(titrePartiel.toLowerCase()))
                 .map(doc -> convertToLivreDTO((Livre) doc))
@@ -114,14 +110,12 @@ public class DocumentService {
                 .collect(Collectors.toList());
     }
 
-    // Méthode pour vérifier la disponibilité d'un document
 
     public boolean verifierDisponibilite(int documentId) {
         Optional<Document> document = documentRepository.findById(documentId);
         return document.map(Document::verifieDisponibilite).orElse(false);
     }
 
-    // Méthodes utilitaires pour convertir les entités en DTOs
 
     private LivreDTO convertToLivreDTO(Livre livre) {
         LivreDTO dto = new LivreDTO();

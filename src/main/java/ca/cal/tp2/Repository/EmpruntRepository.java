@@ -7,4 +7,5 @@ import java.util.List;
 public interface EmpruntRepository extends Repository<Emprunt>{
     List<Emprunt> findByEmprunteurId(int emprunteurId);
 
+    List<Emprunt> findByEmprunteurIdWithDetails(int emprunteurId);
 }

@@ -6,6 +6,9 @@ import ca.cal.tp2.Repository.EmprunteurRepository;
 import ca.cal.tp2.dto.EmpruntDTO;
 import ca.cal.tp2.dto.EmpruntDetailDTO;
 import ca.cal.tp2.modele.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EmpruntService {
+
     private final EmpruntRepository empruntRepository;
     private final EmprunteurRepository emprunteurRepository;
     private final DocumentRepository documentRepository;
@@ -25,77 +29,78 @@ public class EmpruntService {
         this.emprunteurRepository = emprunteurRepository;
         this.documentRepository = documentRepository;
     }
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("tp2-h25-ghilas.pu");
 
-    // Emprunter un document
-    public EmpruntDTO emprunterDocument(int emprunteurId, int documentId) {
-        // Vérifier si l'emprunteur existe
-        Optional<Emprunteur> emprunteurOpt = emprunteurRepository.findById(emprunteurId);
-        if (emprunteurOpt.isEmpty()) {
-            throw new IllegalArgumentException("Emprunteur non trouvé");
+
+
+        public EmpruntDTO emprunterDocument(int emprunteurId, int documentId) {
+            Optional<Emprunteur> emprunteurOpt = emprunteurRepository.findById(emprunteurId);
+            if (emprunteurOpt.isEmpty()) {
+                throw new IllegalArgumentException("Emprunteur non trouvé");
+            }
+
+            Optional<Document> documentOpt = documentRepository.findById(documentId);
+            if (documentOpt.isEmpty()) {
+                throw new IllegalArgumentException("Document non trouvé");
+            }
+
+            Emprunteur emprunteur = emprunteurOpt.get();
+            Document document = documentOpt.get();
+
+            if (!document.verifieDisponibilite()) {
+                throw new IllegalStateException("Document non disponible");
+            }
+
+            Emprunt emprunt = new Emprunt();
+            emprunt.setEmprunteur(emprunteur);
+            emprunt.setDateEmprunt(LocalDate.now());
+            emprunt.setStatus("EN_COURS");
+
+            Emprunt savedEmprunt = empruntRepository.save(emprunt);
+
+            EmpruntDetail detail = new EmpruntDetail();
+            detail.setEmprunt(savedEmprunt);
+            detail.setDocument(document);
+            detail.setStatus("EN_COURS");
+
+            LocalDate dateRetourPrevue;
+            if (document instanceof Livre) {
+                dateRetourPrevue = LocalDate.now().plusWeeks(3);
+            } else if (document instanceof Cd) {
+                dateRetourPrevue = LocalDate.now().plusWeeks(2);
+            } else {
+                dateRetourPrevue = LocalDate.now().plusWeeks(1);
+            }
+            detail.setDateRetourPrevue(dateRetourPrevue);
+
+            savedEmprunt.getEmpruntDetails().add(detail);
+
+            document.emprunter();
+            documentRepository.update(document);
+
+            //  Sauvegarde explicite le détail d'emprunt
+            EntityManager em = emf.createEntityManager();
+            try {
+                em.getTransaction().begin();
+                em.persist(detail);  // Persister explicitement l'EmpruntDetail
+                em.getTransaction().commit();
+            } finally {
+                em.close();
+            }
+
+            empruntRepository.update(savedEmprunt);
+
+            return convertToDTO(savedEmprunt);
         }
 
-        // Vérifier si le document existe
-        Optional<Document> documentOpt = documentRepository.findById(documentId);
-        if (documentOpt.isEmpty()) {
-            throw new IllegalArgumentException("Document non trouvé");
-        }
 
-        Emprunteur emprunteur = emprunteurOpt.get();
-        Document document = documentOpt.get();
-
-        // Vérifier si le document est disponible
-        if (!document.verifieDisponibilite()) {
-            throw new IllegalStateException("Document non disponible");
-        }
-
-        // Créer un nouvel emprunt
-        Emprunt emprunt = new Emprunt();
-        emprunt.setEmprunteur(emprunteur);
-        emprunt.setDateEmprunt(LocalDate.now());
-        emprunt.setStatus("EN_COURS");
-
-        Emprunt savedEmprunt = empruntRepository.save(emprunt);
-
-        // Créer un détail d'emprunt
-        EmpruntDetail detail = new EmpruntDetail();
-        detail.setEmprunt(savedEmprunt);
-        detail.setDocument(document);
-        detail.setStatus("EN_COURS");
-
-        // Calculer la date de retour prévue selon le type de document
-        LocalDate dateRetourPrevue;
-        if (document instanceof Livre) {
-            dateRetourPrevue = LocalDate.now().plusWeeks(3); // 3 semaines pour les livres
-        } else if (document instanceof Cd) {
-            dateRetourPrevue = LocalDate.now().plusWeeks(2); // 2 semaines pour les CD
-        } else {
-            dateRetourPrevue = LocalDate.now().plusWeeks(1); // 1 semaine pour les DVD
-        }
-        detail.setDateRetourPrevue(dateRetourPrevue);
-
-        // Ajouter le détail à l'emprunt
-        savedEmprunt.getEmpruntDetails().add(detail);
-
-        // Mettre à jour la disponibilité du document
-        document.emprunter();
-        documentRepository.update(document);
-
-        // Mettre à jour l'emprunt
-        empruntRepository.update(savedEmprunt);
-
-        // Convertir en DTO
-        return convertToDTO(savedEmprunt);
-    }
-
-    // Obtenir tous les emprunts d'un emprunteur
     public List<EmpruntDTO> obtenirEmpruntsParEmprunteur(int emprunteurId) {
-        List<Emprunt> emprunts = empruntRepository.findByEmprunteurId(emprunteurId);
+        List<Emprunt> emprunts = empruntRepository.findByEmprunteurIdWithDetails(emprunteurId);
         return emprunts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    // Méthodes utilitaires pour la conversion entité <-> DTO
 
     private EmpruntDTO convertToDTO(Emprunt emprunt) {
         EmpruntDTO dto = new EmpruntDTO();

@@ -13,7 +13,7 @@ import lombok.Setter;
 public class Livre extends Document {
     private String ISBN;
     private String editeur;
-    private String Auteur;
+    private String auteur;
     private int nbPages;
     private int anneePublication;
 }

@@ -95,4 +95,26 @@ public class EmpruntRepositoryJPA implements EmpruntRepository {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<Emprunt> findByEmprunteurIdWithDetails(int emprunteurId) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+
+            // Requête JPQL avec JOIN FETCH pour charger les détails d'emprunt et les documents
+            TypedQuery<Emprunt> query = em.createQuery(
+                    "SELECT DISTINCT e FROM Emprunt e " +
+                            "LEFT JOIN FETCH e.empruntDetails ed " +
+                            "LEFT JOIN FETCH ed.document " +
+                            "WHERE e.emprunteur.userId = :emprunteurId",
+                    Emprunt.class);
+            query.setParameter("emprunteurId", emprunteurId);
+
+            List<Emprunt> result = query.getResultList();
+            em.getTransaction().commit();
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

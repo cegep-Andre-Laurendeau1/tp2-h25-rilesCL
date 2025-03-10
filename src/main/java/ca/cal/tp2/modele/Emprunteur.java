@@ -29,21 +29,4 @@ public class Emprunteur extends Utilisateur {
             document.emprunter();
         }
     }
-
-    //Implémenter la méthode retourneDocument(Document document) dans la classe Emprunteur !
-//    public void retourneDocument(Document document) {
-//        if (document != null) {
-//            for (Emprunt emprunt : emprunts) {
-//                if (emprunt.getStatus().equals("EN_COURS")) {
-//                    emprunt.setStatus("RETOURNE");
-//                    break;
-//                }
-//            }
-//        }
-//    }
-
-    public ArrayList<Emprunt> rapportHistoriqueEmprunt() {
-        return new ArrayList<>(emprunts);
-    }
-
 }

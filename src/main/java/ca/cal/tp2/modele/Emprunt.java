@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,11 +19,10 @@ public class Emprunt{
     private int borrowID;
 
     @ManyToOne
-    @JoinColumn(name = "emprunteurId")
     private Emprunteur emprunteur;
 
     @OneToMany(mappedBy = "emprunt")
-    private List<EmpruntDetail> empruntDetails;
+    private List<EmpruntDetail> empruntDetails = new ArrayList<>();
 
     private LocalDate dateEmprunt;
     private String status;

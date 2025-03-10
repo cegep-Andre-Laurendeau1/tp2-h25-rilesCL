@@ -15,7 +15,6 @@ public class EmprunteurService {
         this.emprunteurRepository = emprunteurRepository;
     }
 
-    // Enregistrer un nouvel emprunteur
     public EmprunteurDTO enregistrerEmprunteur(EmprunteurDTO emprunteurDTO) {
         Emprunteur emprunteur = new Emprunteur();
         emprunteur.setName(emprunteurDTO.getName());
@@ -28,13 +27,11 @@ public class EmprunteurService {
         return emprunteurDTO;
     }
 
-    // Obtenir un emprunteur par son ID
     public Optional<EmprunteurDTO> obtenirEmprunteur(int id) {
         Optional<Emprunteur> emprunteur = emprunteurRepository.findById(id);
         return emprunteur.map(this::convertToDTO);
     }
 
-    // Obtenir tous les emprunteurs
     public List<EmprunteurDTO> obtenirTousLesEmprunteurs() {
         List<Emprunteur> emprunteurs = emprunteurRepository.findAll();
         return emprunteurs.stream()
@@ -42,7 +39,6 @@ public class EmprunteurService {
                 .collect(Collectors.toList());
     }
 
-    // Méthode utilitaire pour convertir une entité Emprunteur en DTO
     private EmprunteurDTO convertToDTO(Emprunteur emprunteur) {
         EmprunteurDTO dto = new EmprunteurDTO();
         dto.setUserId(emprunteur.getUserId());
